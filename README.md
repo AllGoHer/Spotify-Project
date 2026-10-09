@@ -150,13 +150,15 @@ El mayor valor de este proyecto no es el "Select *", sino cómo resuelve la **in
 
 - **Lookup Activity (last_cdc):** Lee un archivo cdc.json en el Data Lake que contiene el último timestamp o ID procesado (ej: 1901).
 - **Copy Data Activity:** Ejecuta un query dinámico a Azure SQL:
-SELECT * FROM DimUser WHERE UserId > '@{activity('last_cdc').output.value[0].cdc}'
+
+    SELECT * FROM DimUser WHERE UserId > '@{activity('last_cdc').output.value[0].cdc}'
 
 - **Script Activity (max_cdc):** Obtiene el nuevo máximo de la tabla origen:
-SELECT MAX(UserId) as cdc FROM DimUser
+
+    SELECT MAX(UserId) as cdc FROM DimUser
 
 - **Copy Data Activity (update_last_cdc):** Sobrescribe el archivo cdc.json con el nuevo max_cdc para la próxima ejecución.
-If Condition: Si dataRead == 0 (no hay datos nuevos), elimina el archivo Parquet vacío para no ensuciar el Data Lake. 
+- **If Condition:** Si dataRead == 0 (no hay datos nuevos), elimina el archivo Parquet vacío para no ensuciar el Data Lake. 
 
 
 ![image]()
