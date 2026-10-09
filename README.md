@@ -36,76 +36,59 @@ La solución aplica principios fundamentales de la ingeniería de datos moderna,
 
 - Construir una base para futuras soluciones de analítica y Business Intelligence.
 
+____________________________________________________________________________________________________________________________________________________________________________________________________________________________
+## 🏗️ Arquitectura
 
+![image](https://github.com/user-attachments/assets/e8b01cd8-c310-4917-a130-d87f5a858073)
 
-  +-----------------------------------------------------------------------------+
-|                          CAPA DE FUENTES DE DATOS                           |
-|                                                                             |
-|    +------------------+              +-------------------------------+      |
-|    |   Spotify API    |              |    Azure SQL Database         |      |
-|    |   (REST)         |              |    (Tablas de negocio)        |      |
-|    +--------+---------+              +---------------+---------------+      |
-+-------------|----------------------------------------|----------------------+
-              |                                        |
-              |  Extraccion incremental                |  Consulta SQL
-              |  (REST + paginacion)                   |  (Watermark)
-              v                                        v
-+-----------------------------------------------------------------------------+
-|                     CAPA DE CONTROL Y ORQUESTACION                          |
-|                                                                             |
-|    +------------------+              +-------------------------------+      |
-|    |  Azure Data      |<------------>|  cdc.json                     |      |
-|    |  Factory         |              |  (Watermark / CDC)            |      |
-|    |  (Pipeline)      |              |                               |      |
-|    +--------+---------+              +-------------------------------+      |
-+-------------|---------------------------------------------------------------+
-              |
-              |  Copy Activity (escritura de datos brutos)
-              v
-+-----------------------------------------------------------------------------+
-|              CAPA DE ALMACENAMIENTO - ADLS Gen2 (Medallion)                 |
-|                                                                             |
-|    +------------------+    +------------------+    +------------------+     |
-|    |  BRONZE          |    |  SILVER          |    |  GOLD            |     |
-|    |  Datos brutos    |--->|  Datos limpios   |--->|  Datos modelados |     |
-|    |  JSON / CSV      |    |  Parquet / Delta |    |  Delta Table     |     |
-|    +------------------+    +------------------+    +------------------+     |
-+---------------------------------|-------------------------------------------+
-                                  |
-                                  |  Spark lectura / escritura
-                                  v
-+-----------------------------------------------------------------------------+
-|                          CAPA DE COMPUTO                                    |
-|                                                                             |
-|    +---------------------------------------------------------------+        |
-|    |  Azure Databricks                                             |        |
-|    |  PySpark + Delta Lake                                         |        |
-|    |  Limpieza, validacion, transformacion, agregacion             |        |
-|    +---------------------------------------------------------------+        |
-+---------------------------------|-------------------------------------------+
-                                  |
-                                  |  Delta Tables listas para consumo
-                                  v
-+-----------------------------------------------------------------------------+
-|                          CAPA DE CONSUMO                                    |
-|                                                                             |
-|    +------------------+              +-------------------------------+      |
-|    |  Power BI        |              |  Databricks SQL               |      |
-|    |  DirectQuery     |              |  Consultas Ad-hoc             |      |
-|    |  o Import        |              |  SQL Warehouse                |      |
-|    +------------------+              +-------------------------------+      |
-+-----------------------------------------------------------------------------+
+flowchart TB
+    subgraph FUENTES["CAPA DE FUENTES DE DATOS"]
+        A["Spotify API"]
+        B["Azure SQL Database"]
+    end
 
-+-----------------------------------------------------------------------------+
-|                       GOBERNANZA Y SEGURIDAD                                |
-|                                                                             |
-|    +------------------+  +------------------+  +------------------+         |
-|    |  Unity Catalog   |  |  Azure Entra ID  |  |  Azure Key Vault |         |
-|    |  Control acceso  |  |  Autenticacion   |  |  Secretos        |         |
-|    +------------------+  +------------------+  +------------------+         |
-+-----------------------------------------------------------------------------+
-![image]()
+    subgraph CONTROL["CAPA DE CONTROL Y ORQUESTACION"]
+        C["Azure Data Factory"]
+        D["Control de Metadatos CDC / Watermark"]
+    end
 
+    subgraph ALMACEN["CAPA DE ALMACENAMIENTO - ADLS Gen2"]
+        E["Capa Bronze - Datos brutos"]
+        F["Capa Silver - Datos limpios"]
+        G["Capa Gold - Datos modelados"]
+    end
+
+    subgraph COMPUTO["CAPA DE COMPUTO"]
+        H["Azure Databricks - PySpark / Delta Lake"]
+    end
+
+    subgraph CONSUMO["CAPA DE CONSUMO"]
+        I["Power BI"]
+        J["Databricks SQL"]
+    end
+
+    subgraph SEGURIDAD["GOBERNANZA Y SEGURIDAD"]
+        K["Unity Catalog"]
+        L["Azure Entra ID"]
+        M["Azure Key Vault"]
+    end
+
+    A --> C
+    B --> C
+    D --> C
+    C --> E
+    E --> H
+    H --> F
+    F --> H
+    H --> G
+    G --> I
+    G --> J
+    K -.-> E
+    K -.-> F
+    K -.-> G
+    L -.-> C
+    L -.-> H
+    M -.-> C
 ![image]()
 
 ![image]()
