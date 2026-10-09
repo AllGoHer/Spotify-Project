@@ -1,1 +1,6 @@
-# Spotify-Project
+# 🎧 Spotify End-to-End Data Engineering Pipeline
+Cloud-Native Medallion Architecture with Incremental CDC on Azure
+______________________________________________________________________________________________________________________________________________________________________________________________________________________________
+
+
+![image](https://github.com/user-attachments/assets/74d0b6de-caef-4318-b7fb-5c56c6c4478d)
