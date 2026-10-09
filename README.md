@@ -41,8 +41,10 @@ ________________________________________________________________________________
 
 ![image](https://github.com/user-attachments/assets/e8b01cd8-c310-4917-a130-d87f5a858073)
 
+____________________________________________________________________________________________________________________________________________________________________________________________________________________________
 ### Descripción Detallada de Cada Capa
 
+___________________________________________________________________________________________________________
 #### 1. Capa de Fuentes de Datos
 | Fuente | Descripción |
 |--------|-------------|
@@ -52,20 +54,22 @@ ________________________________________________________________________________
 
 **<mark>Decisión clave de diseño:</mark>** Las estrategias de incrementalidad de Spotify API y Azure SQL son diferentes. El lado de la API depende de ventanas de tiempo + paginación, mientras que el lado SQL depende de columnas watermark. Ambos son orquestados de manera unificada por ADF.
 
+______________________________________________________________________________________________________________
 #### 2. Capa de Control y Orquestación
 
 **Azure Data Factory es el único motor de orquestación**, responsable de:
 
-**Disparadores programados:** Inicia Pipelines según un calendario (por ejemplo, cada hora/diariamente).
+- **Disparadores programados:** Inicia Pipelines según un calendario (por ejemplo, cada hora/diariamente).
 
-**Lógica de carga incremental:** Lee la marca de agua de cdc.json mediante la actividad Lookup, construye consultas incrementales (WHERE cdc_column > last_cdc_value).
+- **Lógica de carga incremental:** Lee la marca de agua de cdc.json mediante la actividad Lookup, construye consultas incrementales (WHERE cdc_column > last_cdc_value).
 
-**Parametrización dinámica:** Utiliza parámetros como schema, table, cdc_col para que un solo Pipeline sirva a múltiples tablas.
+- **Parametrización dinámica:** Utiliza parámetros como schema, table, cdc_col para que un solo Pipeline sirva a múltiples tablas.
 
-**Ramas condicionales:** La actividad If determina si hay nuevos datos. Si no los hay, omite el Copy, ahorrando recursos de cómputo.
+- **Ramas condicionales:** La actividad If determina si hay nuevos datos. Si no los hay, omite el Copy, ahorrando recursos de cómputo.
 
-**Actualización de marca de agua:** Después de completar el Copy, la actividad Script obtiene el valor máximo de CDC de la tabla fuente y lo escribe de vuelta en cdc.json para la siguiente ejecución.
+- **Actualización de marca de agua:** Después de completar el Copy, la actividad Script obtiene el valor máximo de CDC de la tabla fuente y lo escribe de vuelta en cdc.json para la siguiente ejecución.
 
+_________________________________________________________________________________________________________________
 **Mecanismo de control CDC**
 
   
@@ -73,6 +77,7 @@ ________________________________________________________________________________
 
 La ventaja de este patrón es cero procedimientos almacenados, cero dependencias externas, completamente impulsado por metadatos JSON.
 
+___________________________________________________________________________________________________________________
 #### 3. Capa de Almacenamiento — ADLS Gen2 (Tres Capas Medallion)
 
 | Capa | Contenido | Formato | Política de Retención | Usuarios |
@@ -82,24 +87,26 @@ La ventaja de este patrón es cero procedimientos almacenados, cero dependencias
 | Gold | Modelado dimensional, agregación, tablas orientadas al negocio | Delta Table | Optimizado para informes | Desarrolladores BI, usuarios de negocio |
 
 
-**Principio de la capa Bronze:** Sin limpieza, se retiene el estado original como "fuente única de verdad", permitiendo reprocesamiento en cualquier momento.
+- **Principio de la capa Bronze:** Sin limpieza, se retiene el estado original como "fuente única de verdad", permitiendo reprocesamiento en cualquier momento.
 
-**Principio de la capa Silver:** Esquema forzado, manejo de nulos, deduplicación, validación de reglas de negocio.
+- **Principio de la capa Silver:** Esquema forzado, manejo de nulos, deduplicación, validación de reglas de negocio.
 
-**Principio de la capa Gold:** Modelo estrella o tablas anchas, optimizadas para rendimiento de consultas, compatible con DirectQuery.
+- **Principio de la capa Gold:** Modelo estrella o tablas anchas, optimizadas para rendimiento de consultas, compatible con DirectQuery.
 
+____________________________________________________________________________________________________________________________
 #### 4. Capa de Cómputo — Azure Databricks
 
 Databricks asume **todas las transformaciones de Silver y Gold:**
 
-**Bronze → Silver:** PySpark lee JSON/CSV brutos, ejecuta lógica de limpieza (conversión de tipos, relleno de nulos, deduplicación, restricciones de esquema), escribe en formato Delta.
+- **Bronze → Silver:** PySpark lee JSON/CSV brutos, ejecuta lógica de limpieza (conversión de tipos, relleno de nulos, deduplicación, restricciones de esquema), escribe en formato Delta.
 
-**Silver → Gold:** Agregación de lógica de negocio (como estadísticas de reproducción por usuario, por canción), modelado dimensional, escritura como Delta Table.
+- **Silver → Gold:** Agregación de lógica de negocio (como estadísticas de reproducción por usuario, por canción), modelado dimensional, escritura como Delta Table.
 
-**Ventajas de Delta Lake:** Transacciones ACID, viaje en el tiempo (Time Travel), Schema Evolution, soporte para control de versiones de datos y rollback.
+- **Ventajas de Delta Lake:** Transacciones ACID, viaje en el tiempo (Time Travel), Schema Evolution, soporte para control de versiones de datos y rollback.
 
 Databricks se integra de forma segura con ADLS Gen2 a través de Unity Catalog: crea un Access Connector, otorga el rol Storage Blob Data Contributor a la Managed Identity, y luego crea Storage Credential y External Location en Unity Catalog.
 
+_____________________________________________________________________________________________________________________________
 #### 5. Capa de Consumo
 
 | Herramienta | Método de Conexión | Escenario de Uso |
@@ -110,7 +117,7 @@ Databricks se integra de forma segura con ADLS Gen2 a través de Unity Catalog: 
 
 **<mark>Puntos clave de conexión de Power BI:</mark>** Usa el Server Hostname y HTTP Path del workspace de Databricks, autenticación mediante Personal Access Token o Azure AD. Para tablas Gold de alta frecuencia de actualización, se recomienda DirectQuery + Auto Page Refresh para obtener una experiencia casi en tiempo real.
 
-
+_______________________________________________________________________________________________________________________________
 #### 6. Gobernanza y Seguridad (fácil de omitir pero debe incluirse)
 
 | Componente | Función |
@@ -122,6 +129,7 @@ Databricks se integra de forma segura con ADLS Gen2 a través de Unity Catalog: 
 
 **Principio de diseño de permisos:** Los usuarios de la capa Gold no deberían ver datos de Bronze/Silver. Esto se logra mediante roles de acceso de Unity Catalog o aislamiento en Workspaces separados.
 
+_____________________________________________________________________________________________________________________________
 ## 🛠️ Stack Tecnológico Detallado
 
 | Herramienta | Rol en el Proyecto | Justificación Arquitectónica |
@@ -131,7 +139,7 @@ Databricks se integra de forma segura con ADLS Gen2 a través de Unity Catalog: 
 | Azure SQL Database | Sistema Fuente (OLTP) | Simula la base de datos transaccional donde Spotify registra reproducciones y usuarios. |
 | Azure Databricks | Procesamiento (ELT) | Motor de transformación. Aplica Upserts (Merge) y agregaciones complejas usando Spark/PySpark. |
 | Delta Lake | Formato de Archivo | Utilizado en Silver/Gold. Permite ACID transactions, Time Travel y UPSERTS que Parquet no soporta. |
-| Power BI | Visualización	Consumo directo de la capa Gold para mé;tricas operativas de Spotify. |
+| Power BI | Visualización | Consumo directo de la capa Gold para métricas operativas de Spotify. |
 
 ____________________________________________________________________________________________________________________________________________________________________________________________________________________________
 ### 🧠 La Magia: Patrón CDC en Azure Data Factory
@@ -142,15 +150,12 @@ El mayor valor de este proyecto no es el "Select *", sino cómo resuelve la **in
 
 - **Lookup Activity (last_cdc):** Lee un archivo cdc.json en el Data Lake que contiene el último timestamp o ID procesado (ej: 1901).
 - **Copy Data Activity:** Ejecuta un query dinámico a Azure SQL:
-
 SELECT * FROM DimUser WHERE UserId > '@{activity('last_cdc').output.value[0].cdc}'
 
 - **Script Activity (max_cdc):** Obtiene el nuevo máximo de la tabla origen:
-
 SELECT MAX(UserId) as cdc FROM DimUser
 
 - **Copy Data Activity (update_last_cdc):** Sobrescribe el archivo cdc.json con el nuevo max_cdc para la próxima ejecución.
-
 If Condition: Si dataRead == 0 (no hay datos nuevos), elimina el archivo Parquet vacío para no ensuciar el Data Lake. 
 
 
