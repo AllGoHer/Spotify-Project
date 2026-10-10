@@ -192,7 +192,7 @@ Código:
 - Mejora la eficiencia de los procesos de ingesta.
 - Proporciona una base para desarrollar procesos de integración de datos más escalables.
 
-**Nota técnica:** el mecanismo de watermark implementado en este proyecto permite gestionar cargas incrementales. No debe confundirse automáticamente con CDC nativo de SQL Server, que utiliza mecanismos específicos para registrar cambios.
+💡**Nota técnica:** el mecanismo de watermark implementado en este proyecto permite gestionar cargas incrementales. No debe confundirse automáticamente con CDC nativo de SQL Server, que utiliza mecanismos específicos para registrar cambios.
 
 **3. Funcionalidades Avanzadas de Delta Lake**
 
@@ -200,7 +200,7 @@ Código:
 
 - **Viaje en el tiempo:** Permite consultar cualquier versión histórica
 
--**Tombstoning:** Gestión de eliminación lógica
+- **Tombstoning:** Gestión de eliminación lógica
 
 **4. Procesamiento de Escenarios en Tiempo Real**
 
