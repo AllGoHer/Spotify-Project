@@ -799,7 +799,7 @@ Ahora aceptamos.
 
 ![image](https://github.com/user-attachments/assets/d04f6d2a-aecc-4b7f-9cf4-bdd9f58c419c)
 
-🎥VIDEO: ![Spotify1_carga_de_datos](https://youtu.be/x01_498suPc)
+🎥VIDEO: [![Spotify1_carga_de_datos](https://youtu.be/x01_498suPc)](https://youtu.be/x01_498suPc)
 
 
 ![image]()
