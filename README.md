@@ -231,7 +231,19 @@ ________________________________________________________________________________
 ____________________________________________________________________________________________________________________________________________________________________________________________________________________________
 ## 📁 Estructura del Proyecto
 
-spotify-azure-pipeline/│├── adf/                         # Código exportado de Azure Data Factory│   ├── pipeline/                # JSON del pipeline incremental_ingestion│   ├── dataset/                 # Datasets parametrizados (SQL, Parquet, JSON)│   └── linkedService/           # Conexiones a SQL, ADLS│├── databricks/                  # Notebooks de transformación│   ├── 01_silver_upsert.py      # Lógica MERGE desde Bronze a Silver│   └── 02_gold_aggregations.py  # Creación de tablas para Power BI│├── sql/                         # Scripts SQL│   └── spotify_initial_load.sql # Creación de tablas y data mock en Azure SQL│├── powerbi/                     # Archivos de visualización│   └── spotify_dashboard.pbix  # Dashboard conectado a Databricks/Gold│├── docs/                        # Documentación adicional│   └── ARCHITECTURE_DECISIONS.md│└── README.md
+spotify-azure-pipeline/│├── adf/
+# Código exportado de Azure Data Factory│   ├── pipeline/                
+# JSON del pipeline incremental_ingestion│   ├── dataset/                 
+# Datasets parametrizados (SQL, Parquet, JSON)│   └── linkedService/           
+# Conexiones a SQL, ADLS│├── databricks/                  
+# Notebooks de transformación│   ├── 01_silver_upsert.py      
+# Lógica MERGE desde Bronze a Silver│   └── 02_gold_aggregations.py  
+# Creación de tablas para Power BI│├── sql/                         
+# Scripts SQL│   └── spotify_initial_load.sql 
+# Creación de tablas y data mock en Azure SQL│├── powerbi/                     
+# Archivos de visualización│   └── spotify_dashboard.pbix  
+# Dashboard conectado a Databricks/Gold│├── docs/                        
+# Documentación adicional│   └── ARCHITECTURE_DECISIONS.md│└── README.md
 
 
 
