@@ -228,31 +228,95 @@ ________________________________________________________________________________
 - **Formato:** Delta Lake.
 - **Acción:** Databricks agrupa las reproducciones por artista, canción y fecha para generar métricas de popularidad y tendencia.
 
-____________________________________________________________________________________________________________________________________________________________________________________________________________________________
+__________________________________________________________________________________________________________________________________________________________________________________________________
 ## 📁 Estructura del Proyecto
 
-spotify-azure-pipeline/│├── adf/
-# Código exportado de Azure Data Factory│   ├── pipeline/                
-# JSON del pipeline incremental_ingestion│   ├── dataset/                 
-# Datasets parametrizados (SQL, Parquet, JSON)│   └── linkedService/           
-# Conexiones a SQL, ADLS│├── databricks/                  
-# Notebooks de transformación│   ├── 01_silver_upsert.py      
-# Lógica MERGE desde Bronze a Silver│   └── 02_gold_aggregations.py  
-# Creación de tablas para Power BI│├── sql/                         
-# Scripts SQL│   └── spotify_initial_load.sql 
-# Creación de tablas y data mock en Azure SQL│├── powerbi/                     
-# Archivos de visualización│   └── spotify_dashboard.pbix  
-# Dashboard conectado a Databricks/Gold│├── docs/                        
-# Documentación adicional│   └── ARCHITECTURE_DECISIONS.md│└── README.md
+![image](https://github.com/user-attachments/assets/f1506c44-426e-4e3f-80c8-a46aeef94d2d)
 
 
+__________________________________________________________________________________________________________________________________________________________________________________________________
+## 🚀 Quick Start
+
+**Requisitos Previos**
+- Suscripción de Azure.
+- Instancia de Azure Data Factory.
+- Espacio de trabajo de Azure Databricks.
+- Cuenta de almacenamiento ADLS Gen2.
+
+**Paso 1:** Clonar el Repositorio
+
+git clone https://github.com/AllGoHer/spotify-project.git
+
+**Paso 2:** Crear Infraestructura en Azure (Portal)
+
+1. Inicia sesión en portal.azure.com.
+2. Crea un Grupo de Recursos llamado RG-Spotify.
+3. Dentro de RG-Spotify, crea los siguientes recursos:
+4. Storage Account: spotiproject (Habilitar Hierarchical namespace para ADLS Gen2).
+5. Dentro del Storage, ve a Containers y crea 3 contenedores: bronze, silver, gold.
+6. Azure SQL Database: sql-spotify (Configura un servidor y contraseña).
+7. Data Factory: df-SpotifyProject (Al crearlo, selecciona la opción de Git integration para vincularlo a tu repositorio local clonado).
+
+**Paso 3: Poblar la Base de Datos (Azure SQL)**
+
+1. Ve a tu Azure SQL Database (sql-spotify) en el portal.
+2. Abre el Query Editor y autentícate con tu usuario/contraseña.
+3. Abre el archivo local sql/spotify_initial_load.sql.
+4. Copia todo el contenido, pégalo en el Query Editor y ejecútalo.
+5. Resultado: Se crearán las tablas DimUser, DimArtist, DimTrack, DimDate y FactListening con miles de filas simuladas.
+
+**Paso 4: Configurar CDC (Change Data Capture) en ADLS**
+
+Para que el pipeline sepa dónde dejó de leer la última vez, necesita los archivos "watermark" (marcas de agua).
+
+1. Abre Azure Storage Explorer (o usa el portal) y conéctate a tu Storage Account spotiproject.
+2. Navega al contenedor bronze.
+3. Crea una carpeta llamada cdc dentro de bronze.
+4. Copia los archivos empty.json y cdc.json de la carpeta raíz de tu repositorio clonado a la carpeta bronze/cdc/.
+5. Crea las subcarpetas para las dimensiones dentro de bronze: DimUser_cdc, DimArtist_cdc, DimTrack_cdc, DimDate_cdc.
+6. Importante: Copia el archivo cdc.json dentro de cada una de esas subcarpetas recién creadas.
 
 
+**Paso 5: Configurar Azure Data Factory (Linked Services)**
+
+Si usaste la integración de Git en el Paso 2, los pipelines y datasets ya están importados. Solo necesitas apuntarlos a tus recursos:
+
+1. Abre Azure Data Factory Studio (Manage -> Author).
+2. Ve a Manage -> Linked services.
+3. Abre el Linked Service de Azure SQL y actualiza el nombre del servidor y la contraseña con los del Paso 2. Haz "Test connection" y guarda.
+4. Abre el Linked Service de ADLS Gen2 y actualiza el nombre del Storage Account. Haz "Test connection" y guarda.
 
 
+**Paso 6: Ejecutar el Pipeline (Debug)**
+1. En Data Factory, ve a la pestaña Author y abre el pipeline incremental_ingestion.
+2. Haz clic en Debug (Depurar).
+3. En la ventana emergente de parámetros, ingresa lo siguiente:
+    - schema: dbo
+    - table: DimUser
+    - cdc_col: Updated_at
 
+Haz clic en OK.
 
-![image]()
+Espera a que todas las actividades del pipeline se pongan en verde.
+
+Ve a la salida de la actividad last_cdc y verifica que devuelva un valor (ej: 1901).
+
+**Paso 7: Verificar los Datos en el Data Lake**
+1. Abre Azure Storage Explorer.
+2. Navega a spotiproject -> bronze -> DimUser.
+3. Deberás ver un archivo Parquet nuevo con timestamp (ej: DimUser_20261008_120000.parquet).
+4. ¡Felicidades! Tu ingesta incremental CDC está funcionando.
+
+**Paso 8: Transformar en Databricks (Silver & Gold)**
+
+1. Crea un clúster en Azure Databricks.
+2. Sube los notebooks de la carpeta databricks/ a tu Workspace.
+3. Ejecuta 01_silver_upsert.py adjuntando tu clúster (esto convertirá Bronze Parquet a Silver Delta con lógica MERGE).
+4. Ejecuta 02_gold_aggregations.py (esto creará las tablas finales para Power BI).
+
+__________________________________________________________________________________________________________________________________________________________________________________________________
+## DESARROLLO Y EVIDENCIAS.
+
 
 ![image]()
 
@@ -621,3 +685,11 @@ spotify-azure-pipeline/│├── adf/
 ![image]()
 
 video1: https://youtu.be/x01_498suPc
+
+video2: https://youtu.be/KmfgqQUKgz4
+
+VIDEO3: https://youtu.be/J0pjGjG1Zp8
+
+video4: 
+
+
