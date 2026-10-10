@@ -317,52 +317,69 @@ Ve a la salida de la actividad last_cdc y verifica que devuelva un valor (ej: 19
 __________________________________________________________________________________________________________________________________________________________________________________________________
 ## DESARROLLO Y EVIDENCIAS.
 
+Iniciamos ingresando a Azure / grupo de recursos y creamos un nuevo recurso.
 
-![image]()
+![image](https://github.com/user-attachments/assets/a195fcbf-fd73-48d6-9082-4f917b6d2354)
 
-![image]()
+![image](https://github.com/user-attachments/assets/99f20a86-934d-4e92-b3a9-dec5e0f0cebe)
 
-![image]()
+![image](https://github.com/user-attachments/assets/4d252228-8452-4e83-90b1-4c0d8eda54f2)
 
-![image]()
+Ahora, vamos a grupo de recursos y actualizamos, para poder seleccionar el nuevo grupo creado.
 
-![image]()
+![image](https://github.com/user-attachments/assets/ea10afd2-a66e-48e8-92d6-e0e327a7209c)
 
-![image]()
+Luego, ingresamos a RG-Spotify y, hacemos click en crear y seleccionamos storage account.
 
-![image]()
+![image](https://github.com/user-attachments/assets/44120d6f-5cac-4e39-b4de-f4245d605ec8)
 
-![image]()
+![image](https://github.com/user-attachments/assets/3da96f7a-7ffe-4352-bd8f-b85d6715c8a4)
 
-![image]()
+![image](https://github.com/user-attachments/assets/bf958238-c93f-4d7e-ab6c-d386fc9ee557)
 
-![image]()
+![image](https://github.com/user-attachments/assets/6cfa6939-1f76-4d4a-a231-30cf91e81e20)
 
-![image]()
+![image](https://github.com/user-attachments/assets/c0f04023-2070-4b88-ae31-6106e134a58e)
 
-![image]()
+![image](https://github.com/user-attachments/assets/7a2acdda-a261-4052-b5b1-a83df6f2cc5f)
 
-![image]()
+Luego, esperas un minuto hasta que se complete la  implementación. 
 
-![image]()
+![image](https://github.com/user-attachments/assets/b7ad4786-1d35-415b-a3d3-04c9c7f7749e)
 
-![image]()
+Ahora, volvemos a grupos de recursos y seleccionamos RG-Spotify y, creamos un nuevo grupo de recurso.
 
-![image]()
+![image](https://github.com/user-attachments/assets/32065988-f8a2-4569-a49b-9b8452c43826)
 
-![image]()
+![image](https://github.com/user-attachments/assets/c20d0000-c7c1-4218-8555-50d94074921c)
 
-![image]()
+![image](https://github.com/user-attachments/assets/a854e6c7-d3a9-4d4d-aa34-d883405a1b5b)
 
-![image]()
+![image](https://github.com/user-attachments/assets/80267d60-45b9-4d85-8600-366dacf5520a)
 
-![image]()
+![image](https://github.com/user-attachments/assets/b91de073-6168-4c36-86c2-5d9c5807eb3e)
 
-![image]()
+![image](https://github.com/user-attachments/assets/048d2018-c66f-4e8b-a1ed-d0d867b9c794)
 
-![image]()
+![image](https://github.com/user-attachments/assets/1f734b0b-571c-4cb9-9208-74fdd497ac88)
 
-![image]()
+Ahora, nos vamos a RG-Spotify y, entramos a la cuenta de almacenamiento spotiproject y luego a containers
+
+![image](https://github.com/user-attachments/assets/83dfbe6f-6bcd-4f4c-b8e8-94cd6d8b4664)
+
+![image](https://github.com/user-attachments/assets/9689577b-926a-43cb-8d5e-97ef7836b123)
+
+Hacemos click en agregar contenedor y lo llamamos bronce 
+
+![image](https://github.com/user-attachments/assets/65c4fd2b-63f4-4432-b8a7-59eb1e620829)
+
+Y hacemos de la misma manera para crear las capas silver y gold.
+
+![image](https://github.com/user-attachments/assets/fa44a413-73cc-4d0f-9426-4ba07bc94d49)
+
+Ahora, nos vamos a df-SpotifyProyecto y entramos a Azure Data Factory.
+
+![image](https://github.com/user-attachments/assets/8a3d07a1-737d-4182-b4aa-e99e4cf15d20)
 
 ![image]()
 
