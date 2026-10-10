@@ -210,27 +210,28 @@ ________________________________________________________________________________
 ## 📂 Arquitectura Medallion (Data Lake Structure)
 
 ### 🥉 Bronze Layer (Raw CDC Data - Append Only)
-Objetivo: Ingesta rápida del "delta" de datos desde Azure SQL.
-Formato: Parquet.
-Ruta: bronze/{Table}_cdc/{Table}_{timestamp}.parquet
-Acción: ADF escribe aquí usando Copy Activity. No se borra ni se/ modifica historial.
+
+- **Objetivo:** Ingesta rápida del "delta" de datos desde Azure SQL.
+- **Formato:** Parquet.
+- **Ruta:** bronze/{Table}_cdc/{Table}_{timestamp}.parquet
+- **Acción:** ADF escribe aquí usando Copy Activity. No se borra ni se/ modifica historial.
 
 ### 🥈 Silver Layer (Cleaned & Deduplicated - UPSERT)
-Objetivo: Datos limpios, sin duplicados y enriquecidos. Aplica SCD Type 1 (Overwrite) or Type 2 (History).
-Formato: Delta Lake (Para permitir operaciones MERGE).
-Acción: Databricks lee los nuevos Parquets de Bronze y ejecuta un MERGE INTO la tabla Silver existente, actualizando usuarios que cambiaron de ciudad o insertando nuevos.
+
+- **Objetivo:** Datos limpios, sin duplicados y enriquecidos. Aplica SCD Type 1 (Overwrite) or Type 2 (History).
+- **Formato:** Delta Lake (Para permitir operaciones MERGE).
+- **Acción:** Databricks lee los nuevos Parquets de Bronze y ejecuta un MERGE INTO la tabla Silver existente, actualizando usuarios que cambiaron de ciudad o insertando nuevos.
 
 ### 🥇 Gold Layer (Aggregated for BI)
-Objetivo: Tablas de hechos y dimensiones listas para consumo.
-Formato: Delta Lake.
-Acción: Databricks agrupa las reproducciones por artista, canción y fecha para generar métricas de popularidad y tendencia.
 
+- **Objetivo:** Tablas de hechos y dimensiones listas para consumo.
+- **Formato:** Delta Lake.
+- **Acción:** Databricks agrupa las reproducciones por artista, canción y fecha para generar métricas de popularidad y tendencia.
 
-
-
+____________________________________________________________________________________________________________________________________________________________________________________________________________________________
 ## 📁 Estructura del Proyecto
 
-
+spotify-azure-pipeline/│├── adf/                         # Código exportado de Azure Data Factory│   ├── pipeline/                # JSON del pipeline incremental_ingestion│   ├── dataset/                 # Datasets parametrizados (SQL, Parquet, JSON)│   └── linkedService/           # Conexiones a SQL, ADLS│├── databricks/                  # Notebooks de transformación│   ├── 01_silver_upsert.py      # Lógica MERGE desde Bronze a Silver│   └── 02_gold_aggregations.py  # Creación de tablas para Power BI│├── sql/                         # Scripts SQL│   └── spotify_initial_load.sql # Creación de tablas y data mock en Azure SQL│├── powerbi/                     # Archivos de visualización│   └── spotify_dashboard.pbix  # Dashboard conectado a Databricks/Gold│├── docs/                        # Documentación adicional│   └── ARCHITECTURE_DECISIONS.md│└── README.md
 
 
 
