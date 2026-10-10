@@ -314,7 +314,36 @@ Ve a la salida de la actividad last_cdc y verifica que devuelva un valor (ej: 19
 3. Ejecuta 01_silver_upsert.py adjuntando tu clúster (esto convertirá Bronze Parquet a Silver Delta con lógica MERGE).
 4. Ejecuta 02_gold_aggregations.py (esto creará las tablas finales para Power BI).
 
-__________________________________________________________________________________________________________________________________________________________________________________________________
+_______________________________________________________________________________________________________________________________________________________________________________________
+## 📊 Presentación de Resultados
+
+- **Escala de datos:** Procesamiento de datos estructurados y semiestructurados devueltos por la API de Spotify
+
+- **Rendimiento del pipeline:** La carga incremental reduce el tiempo de procesamiento de datos en un 80%
+
+- **Calidad de datos:** Validación automática mediante conjuntos de datos parametrizados
+
+________________________________________________________________________________________________________________________________________________________________________________________
+## 🧠 Decisiones Clave de Ingeniería
+| Decisión | Razón |
+|----------|-------|
+| Elegir Delta Lake en lugar de Parquet | Se requieren transacciones ACID y capacidades de viaje en el tiempo |
+| Usar ADF en lugar de Airflow | Integración nativa con el ecosistema Azure, reduciendo costos operativos |
+| Arquitectura Medallion | Desacoplamiento en capas, facilitando depuración y rollback |
+| Parametrización dinámica | Evitar crear pipelines independientes para cada entidad de datos |
+
+________________________________________________________________________________________________________________________________________________________________________________________
+# 👤 Sobre Mí
+
+![image](https://github.com/user-attachments/assets/d504aa64-34ca-423b-91f9-e132e9436002)
+
+Allan Gonzales Heredia | Ingeniero de Datos
+
+🔗 LinkedIn
+
+📧 allgoher007@gmail.com
+
+________________________________________________________________________________________________________________________________________________________________________________________
 ## DESARROLLO Y EVIDENCIAS.
 
 Iniciamos ingresando a Azure / grupo de recursos y creamos un nuevo recurso.
@@ -872,51 +901,255 @@ Y aceptamos.
 🎥VIDEO: [Spotify2-max_cdc](https://youtu.be/KmfgqQUKgz4)
 
 
-![image]()
+![image](https://github.com/user-attachments/assets/f6f084fa-27c4-4865-a83a-4f16accd9586)
 
-![image]()
+Ahora, unimos el script con copiar datos.
 
-![image]()
+![image](https://github.com/user-attachments/assets/1195a3a9-97b5-4662-bb95-da268af08665)
 
-![image]()
+![image](https://github.com/user-attachments/assets/09ef7151-3b2d-4e68-83dc-3db056233846)
 
-![image]()
+![image](https://github.com/user-attachments/assets/38cfce4d-fcd1-4472-a241-f2e0025dc38b)
 
-![image]()
+Código:
 
-![image]()
+        @activity('max_cdc').output.resultSets[0].rows[0].cdc
 
-![image]()
 
-![image]()
+Luego, aceptamos
 
-![image]()
+Ahora, regresamos a la actividad copiar data y lo habilitamos.
 
-![image]()
+![image](https://github.com/user-attachments/assets/94235252-3559-430e-9cb6-5bbc30bf5604)
 
-![image]()
+ Ahora, depuramos.
+ 
+![image](https://github.com/user-attachments/assets/86df9ba1-74b6-4cb9-8b3a-b1e322fa3b42)
 
-![image]()
+![image](https://github.com/user-attachments/assets/8e716427-828b-4b5b-a54e-187c4c2ba39e)
 
-![image]()
+🎥VIDEO: [Spotify3_updated_last_cdc](https://youtu.be/J0pjGjG1Zp8)
 
-![image]()
 
-![image]()
+![image](https://github.com/user-attachments/assets/1e1ceda1-8d6a-4219-a37b-0ac94c87027b)
 
-![image]()
+Ahora depuraremos nuevamente para obtener un nuevo archivo vacío que solo tiene el esquema.
+Después, nos vamos a Azure a la carpeta Users para verificar la generación del nuevo DimUser vacío. 
 
-![image]()
+![image](https://github.com/user-attachments/assets/204e2bbd-a724-4e98-9b06-8433db7b71ae)
 
-![image]()
+Digamos que yo no quiero mi archivo vacío y estamos ejecutando la canalización cada 10 minutos y no tengo ningún dato en 10 minutos, entonces tendría que preparar o mantener este archivo; pero no quiero hacer eso, para ello haremos una optimización.
+Crearemos una condicional if y dentro de ella pasaremos max_cdc y Update_last_cdc
 
-![image]()
 
-![image]()
+1.	En actividades buscamos if y lo arrastramos al lienzo.
 
-![image]()
+2.	Cortamos max_cdc y Update_last_cdc y lo pegamos dentro de if en la parte true; para ello, hacemos click 2 veces primero en el lápiz del if / true y ya estando dentro del lienzo de if condition1 – Actividades True pegaremos las 2 actividades cortadas.
 
-![image]()
+![image](https://github.com/user-attachments/assets/7c7bd869-db41-4ada-ac08-9deb939f9539)
+
+![image](https://github.com/user-attachments/assets/f45a4370-b573-42f0-8d32-365ba2c55b00)
+
+Luego regresamos al lienzo de incremental_ingestion y, unimos copiar datos con if condition1 
+
+![image](https://github.com/user-attachments/assets/20fe4174-ba69-40d7-8388-4e84d3d0ea00)
+
+Asignamos el nombre de IfIncermentalData a la condición. 
+
+![image](https://github.com/user-attachments/assets/e68f120c-6867-44bc-b35e-106c324b52d0)
+
+Nos dirigimos a actividades y hacemos click dentro del recuadro de Expresión y se activara agregar contenido dinámico y lo seleccionamos.
+
+![image](https://github.com/user-attachments/assets/c186b771-6ed0-4c22-8f72-fea109ec2359)
+
+Código:
+
+        @greater(activity('AzureSQLToLake').output.dataRead,0)
+
+![image](https://github.com/user-attachments/assets/2ef6c8a1-690d-4748-a770-58e5021fabbe)
+
+Luego de damos aceptar.
+
+![image](https://github.com/user-attachments/assets/9785555f-5cfb-423b-81a7-add4df23a3ce)
+
+Ya vimos la parte True de la Condición If; ahora veremos la parte False que, si en caso está vacío, que lo elimine.
+Para ello, ingresamos a False haciendo doble click al lápiz y ya dentro del lienzo de false, nos vamos al buscador de actividades y escribimos eliminar y lo arrastramos al lienzo.
+
+![image](https://github.com/user-attachments/assets/b8827f09-e859-43c2-8bdc-e62760780498)
+
+Y le cambiamos de nombre por DeleteEmptyFile.
+
+![image](https://github.com/user-attachments/assets/56ec9834-084f-4754-b507-3aa1842727f7)
+
+Luego, nos vamos a Origen.
+
+![image](https://github.com/user-attachments/assets/b4d4d841-a979-42e9-887e-1f20d8093af5)
+
+![image](https://github.com/user-attachments/assets/93a863d8-c3c0-4938-bf80-ce3b8b6536f9)
+
+Luego, en el generador de expresiones de canalización en la pestaña de Parámetros, hacemos click en tabla y se agregara el contenido y, luego aceptamos.
+
+![image](https://github.com/user-attachments/assets/a0030f48-fe9f-449f-a23c-b814e2ec9110)
+
+![image](https://github.com/user-attachments/assets/678d88bb-c265-4a85-821d-1cd70cebec50)
+
+Ahora, para file también agregaremos contenido dinámico, cual será el mismo contenido dinámico de la actividad Copiar datos (AzureSQLToLake) 
+
+Código:
+
+        @concat(pipeline().parameters.table,'_',variables('current'))
+
+![image](https://github.com/user-attachments/assets/03d2171b-7a4a-486f-827b-9a316864b788)
+
+Y aceptamos.
+
+![image](https://github.com/user-attachments/assets/8281fc56-d16a-4f6e-913e-50d051b0f3d4)
+
+Ahora, vamos actualizar los datos del Copiar datos (AzureSQLToLake); pare ello, nos vamos al Receptor y en folder borramos User y, hacemos click en el recuadro para seleccionar el texto que dice contenido dinámico.
+
+![image](https://github.com/user-attachments/assets/1da94bb9-0c2e-4b35-ab55-49895b6c3b73)
+
+Ya dentro del generador de expresiones de canalización, seleccionamos Parámetros y hacemos click en tabla para que genere la expresión del contenido dinámico.
+
+![image](https://github.com/user-attachments/assets/37d02b7d-3170-4d79-9088-ede08afcce78)
+
+![image](https://github.com/user-attachments/assets/6077167d-53ef-4d13-abc6-7b4ab56177d3)
+
+Ahora, ejecutaremos la canalización.
+
+![image](https://github.com/user-attachments/assets/2a94a4d8-6ba5-4a81-a75d-2752bd0201ed)
+
+Cerramos el DeleteEmptyFile
+
+![image](https://github.com/user-attachments/assets/8092035c-b227-4f94-b096-07b025231d0e)
+
+Luego, hacemos doble click en el icono de DeleteEmptyFile.
+
+![image](https://github.com/user-attachments/assets/e13dc51a-4c5f-4850-9e56-ff3f8fedc1e8)
+
+Luego hacemos click en configuración de registro y lo deshabilitamos
+
+![image](https://github.com/user-attachments/assets/ad01817a-3c4b-4ff6-ae64-3c2065a15675)
+
+Ahora, depuramos.
+
+![image](https://github.com/user-attachments/assets/2645fdc1-0792-48eb-bf1e-15332d9a7c73)
+
+🎥VIDEO:[Spotify4](https://youtu.be/1vTa1Bhssas)
+
+![image](https://github.com/user-attachments/assets/afc2be58-497d-417c-bd10-de9d6eb02915)
+
+Ahora, en el lienzo general nos vamos a parámetros y creamos un nuevo parámetro llamado from_date
+
+![image](https://github.com/user-attachments/assets/c87e467b-8387-43a5-ad76-fd4e7ae82a7a)
+
+Nos vamos copiar datos (AzureSQLToLake) en Origen y hacemos click en el recuadro de consulta.
+
+![image](https://github.com/user-attachments/assets/59197ca7-115f-4894-9832-18bdf018bef8)
+
+Ahora editamos el código, el cual debe quedar de la siguiente manera.
+
+Código:
+
+        SELECT * FROM @{pipeline().parameters.schema}.@{pipeline().parameters.table} WHERE @{pipeline().parameters.cdc_col} > '@{if(empty(pipeline().parameters.from_date),activity('last_cdc').output.value[0].cdc,pipeline().parameters.from_date)}'
+
+![image](https://github.com/user-attachments/assets/a1ce127c-4e60-46c6-853e-90b8cf36da26)
+
+🎥VIDEO:[Spotify5](https://youtu.be/SlFDUD8QTpE)
+
+![image](https://github.com/user-attachments/assets/e0a64313-9aca-48af-a4ea-b2d32e6bd57e)
+
+Ahora, vamos a probar depurar con la actualización de una fecha anterior.
+
+![image](https://github.com/user-attachments/assets/2bd46ae9-617d-4d59-b330-42a197d64613)
+
+![image](https://github.com/user-attachments/assets/5e73afad-0318-4c60-8e72-cd3cb4636a31)
+
+![image](https://github.com/user-attachments/assets/0fba4064-5af3-4efa-b9b2-c3f9ee434d9a)
+
+Luego, hacemos click en guardar todo y en la ventana emergente aceptamos; con esto guardara todo en el repositorio Git.
+
+
+Ahora, eliminamos la carpeta DimUser y User, solo dejamos cdc.
+
+![image](https://github.com/user-attachments/assets/7f9e9700-6eda-446d-8df8-b9d2b808c6a9)
+
+![image](https://github.com/user-attachments/assets/966429ac-4b79-4860-816f-c99294f1a0ee)
+
+![image](https://github.com/user-attachments/assets/d6038f6b-b03c-45fa-9874-b3cd3f2154c4)
+
+ahora empezaremos de cero cargando manualmente.
+Entonces, agregamos losl directorios en bronze con las Dimensiones. 
+DimUser, DimTrack_cdc, DimArtist_cdc, DimDate_cdc.
+
+![image](https://github.com/user-attachments/assets/80472dbf-db18-4bf0-a4c6-376d074be534)
+
+![image](https://github.com/user-attachments/assets/db94319c-cd53-4f80-996b-f8c9e4c09b26)
+
+Ahora, hacemos click en buscar y nos vamos a configuracion y hacemos click en folder para cambiar el contenido dinamico.
+
+![image](https://github.com/user-attachments/assets/acd8d338-2b05-45ba-8dd2-5a1cc66629bf)
+
+Ya en el generador de expresion de canalizacion pasamos el siguiente codigo.
+
+Codigo:
+
+        @{pipeline().parameters.table}_cdc
+
+![image](https://github.com/user-attachments/assets/b19cb29d-9e20-4918-ad71-328cff1b50f9)
+
+![image](https://github.com/user-attachments/assets/52aca696-5cd9-4e08-bb0e-03812d511de3)
+
+![image](https://github.com/user-attachments/assets/58a747ec-6fac-455a-873a-96ee2c67f455)
+
+Código:
+
+        @{pipeline().parameters.table}_cdc
+
+
+![image](https://github.com/user-attachments/assets/8a6edc87-525d-4217-96de-b0b12102bdaf)
+
+Ahora, ejecutaremos la canalización uno por uno.
+
+![image](https://github.com/user-attachments/assets/69f13a35-dba7-4f7d-bd5a-f2dde7251f64)
+
+Luego creamos otra canalización haciendo un clon de incremental_ingestion llamada icremental_loop.
+Creamos una  actividad ForEach y dentro de ella pasamos las otras actividades para generar un bucle.
+
+![image](https://github.com/user-attachments/assets/f5377fdb-01ef-42b7-bc88-9f967b595b36)
+
+En parámetros eliminamos todas 4 parametros anteriores y creamos uno nuevo.
+
+![image](https://github.com/user-attachments/assets/c5f873e4-f28a-4ab2-bdd9-cf8c77abadee)
+
+En valor predeterminado pasamos el código de mi github llamado loop_input
+
+![image](https://github.com/user-attachments/assets/c7580369-d6d9-4595-9223-cb5cc8c4f887)
+
+Luego hacemos doble click en el lapiz para hacer los cambios.
+
+![image](https://github.com/user-attachments/assets/76161df1-1ce1-4e3a-bdbc-9d123ce15906)
+
+Entramos a búsqueda.
+
+![image](https://github.com/user-attachments/assets/dfc20ecc-e2d3-48bf-b3e0-ba928a0d9e13)
+
+![image](https://github.com/user-attachments/assets/38a48848-fa85-4fe4-9a04-608a86f91ec9)
+
+Ahora, nos vamos a copiar datos en la pestaña Origen.
+
+![image](https://github.com/user-attachments/assets/1746e387-71cc-4486-9bd0-e5c692ecda0a)
+
+Código de contenido dinamico.
+
+Código:
+
+        SELECT * FROM @{item().schema}.@{item().table} WHERE @{item().cdc_col} > '@{if(empty(item().from_date),activity('last_cdc').output.value[0].cdc,item().from_date)}'
+
+![image](https://github.com/user-attachments/assets/b75743a1-64ad-47af-8205-57b60f62b0d9)
+
+
+
 
 video1: https://youtu.be/x01_498suPc
 
