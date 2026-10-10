@@ -206,7 +206,39 @@ Código:
 
 Soporte para lectura de datos a través de Service Principal, cubriendo escenarios de autenticación y gestión de permisos en entornos de producción.
 
+____________________________________________________________________________________________________________________________________________________________________________________________________________________________
+## 📂 Arquitectura Medallion (Data Lake Structure)
 
+### 🥉 Bronze Layer (Raw CDC Data - Append Only)
+Objetivo: Ingesta rápida del "delta" de datos desde Azure SQL.
+Formato: Parquet.
+Ruta: bronze/{Table}_cdc/{Table}_{timestamp}.parquet
+Acción: ADF escribe aquí usando Copy Activity. No se borra ni se/ modifica historial.
+
+### 🥈 Silver Layer (Cleaned & Deduplicated - UPSERT)
+Objetivo: Datos limpios, sin duplicados y enriquecidos. Aplica SCD Type 1 (Overwrite) or Type 2 (History).
+Formato: Delta Lake (Para permitir operaciones MERGE).
+Acción: Databricks lee los nuevos Parquets de Bronze y ejecuta un MERGE INTO la tabla Silver existente, actualizando usuarios que cambiaron de ciudad o insertando nuevos.
+
+### 🥇 Gold Layer (Aggregated for BI)
+Objetivo: Tablas de hechos y dimensiones listas para consumo.
+Formato: Delta Lake.
+Acción: Databricks agrupa las reproducciones por artista, canción y fecha para generar métricas de popularidad y tendencia.
+
+
+
+
+## 📁 Estructura del Proyecto
+
+
+
+
+
+
+
+
+
+
 ![image]()
 
 ![image]()
@@ -574,3 +606,5 @@ Soporte para lectura de datos a través de Service Principal, cubriendo escenari
 ![image]()
 
 ![image]()
+
+video1: https://youtu.be/x01_498suPc
