@@ -802,37 +802,75 @@ Ahora aceptamos.
 🎥VIDEO: [Spotify1_carga_de_datos](https://youtu.be/x01_498suPc)
 
 
-![image]()
+Luego, verificamos en Azure en el archivo de la capa bonze que haya cargado el archivo.
 
-![image]()
+![image](https://github.com/user-attachments/assets/f5f1ad08-87d8-4a23-9171-e986dbf88929)
 
-![image]()
+![image](https://github.com/user-attachments/assets/1f10dc28-e70b-4e7e-801f-132304965323)
 
-![image]()
 
-![image]()
+Si luego vuelves hacer una carga incremental, veras un nuevo archivo, pero con los datos actualizados.
 
-![image]()
+Ahora, creamos una nueva actividad de copiar datos en el lienzo llamado update_last_cdc.
 
-![image]()
+![image](https://github.com/user-attachments/assets/4d481d8d-4ece-493c-9973-f8f492cf82c4)
 
-![image]()
+Unimos las dos actividades de copiar datos.
 
-![image]()
+![image](https://github.com/user-attachments/assets/c9cfabce-bad9-4ab1-8fb1-239cd8ee7cd5)
 
-![image]()
+![image](https://github.com/user-attachments/assets/b11c477e-32b8-4ed2-b5d8-0e1b95c33901)
 
-![image]()
+![image](https://github.com/user-attachments/assets/d6133ee5-03ae-46df-b5b7-d71005616337)
 
-![image]()
+En valor seleccionamos agregar contenido dinámico. 
 
-![image]()
+![image](https://github.com/user-attachments/assets/ede12336-e21a-4df8-a650-8fefe6bc57f1)
 
-![image]()
+Agregamos cualquier contenido dinámico para que no escoja la ruta predeterminada como es $$FILEPATH. 
 
-![image]()
+Y luego aceptamos.
 
-![image]()
+![image](https://github.com/user-attachments/assets/aceb1a7f-621c-4255-8667-0a764c759234)
+
+Esta acción permitirá modificar la data respecto al último cdc.
+
+Ahora, vamos a la pestaña del Receptor (Sink) y pasamos los siguientes datos.
+
+
+![image](https://github.com/user-attachments/assets/75c4a4d0-cbe5-4cd3-8f0e-b57de44c0908)
+
+Ahora, desconectamos las dos actividades de copiar datos para poner una actividad de scripts intermedio, el cual se unirá a la primera actividad de copiar datos.
+
+![image](https://github.com/user-attachments/assets/cdbcd645-ef5a-44da-9bc1-d8daecede33e)
+
+Y cambiamos el nombre por max_cdc.
+
+![image](https://github.com/user-attachments/assets/1a1119ee-4995-45b2-ad9b-aa8f9d689383)
+
+![image](https://github.com/user-attachments/assets/b8e4bcf3-2890-43d3-80fc-76cc6656c43e)
+
+![image](https://github.com/user-attachments/assets/ca4db924-1095-4168-b521-dab79f956b7d)
+
+Código:
+
+        SELECT MAX(@{pipeline().parameters.cdc_col}) as cdc FROM @{pipeline().parameters.schema}.@{pipeline().parameters.table}
+
+
+Ahora, seleccionamos el segundo copiar data y lo desactivamos.
+
+![image](https://github.com/user-attachments/assets/a12320b9-d760-4aa1-a0b3-6a21047151c2)
+
+Luego, depuramos.
+
+![image](https://github.com/user-attachments/assets/c64e43da-6fe6-49f8-bda0-d18d84c555d6)
+
+![image](https://github.com/user-attachments/assets/20e66395-75c9-4d08-86f1-c7e465a78102)
+
+Y aceptamos.
+
+🎥VIDEO: [Spotify2-max_cdc](https://youtu.be/KmfgqQUKgz4)
+
 
 ![image]()
 
