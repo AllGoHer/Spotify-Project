@@ -160,6 +160,52 @@ El mayor valor de este proyecto no es el "Select *", sino cómo resuelve la **in
 - **Copy Data Activity (update_last_cdc):** Sobrescribe el archivo cdc.json con el nuevo max_cdc para la próxima ejecución.
 - **If Condition:** Si dataRead == 0 (no hay datos nuevos), elimina el archivo Parquet vacío para no ensuciar el Data Lake. 
 
+____________________________________________________________________________________________________________________________________________________________________________________________________________________________
+## ✨ Aspectos Técnicos Destacados
+
+**1. Pipeline Parametrizado Dinámico**
+
+Utilizando conjuntos de datos parametrizados y generación dinámica de consultas, se logra que un solo pipeline procese datos de múltiples entidades de Spotify, evitando el mantenimiento de pipelines duplicados.
+
+**2. Carga Incremental de Datos (CDC)**
+
+El pipeline mantiene la marca de agua de CDC mediante la actividad Lookup last_cdc, cargando solo datos nuevos en lugar de sobrescribir todo. Lógica de expresión:
+
+Código:
+
+        @if(empty(pipeline().parameters.from_date),
+            activity('last_cdc').output.value[0].cdc,
+            pipeline().parameters.from_date)
+
+**¿Cómo funciona?**
+- Se consultan los metadatos asociados a la tabla que se va a procesar.
+- Se recupera el último valor de control registrado.
+- Se ejecuta una consulta parametrizada para extraer los registros que superan ese valor.
+- Se calcula el máximo valor de control de los datos procesados.
+- Se actualiza el metadato para la siguiente ejecución.
+- Se contempla una condición para gestionar ejecuciones en las que no existen nuevos registros.
+
+**<mark>Beneficios</mark>**
+- Reduce la necesidad de volver a cargar todos los registros.
+- Permite mantener un punto de control entre ejecuciones.
+- Facilita la reutilización de pipelines para distintas tablas.
+- Mejora la eficiencia de los procesos de ingesta.
+- Proporciona una base para desarrollar procesos de integración de datos más escalables.
+
+**Nota técnica:** el mecanismo de watermark implementado en este proyecto permite gestionar cargas incrementales. No debe confundirse automáticamente con CDC nativo de SQL Server, que utiliza mecanismos específicos para registrar cambios.
+
+**3. Funcionalidades Avanzadas de Delta Lake**
+
+- **Control de versiones de datos:** Cada escritura genera automáticamente una versión
+
+- **Viaje en el tiempo:** Permite consultar cualquier versión histórica
+
+-**Tombstoning:** Gestión de eliminación lógica
+
+**4. Procesamiento de Escenarios en Tiempo Real**
+
+Soporte para lectura de datos a través de Service Principal, cubriendo escenarios de autenticación y gestión de permisos en entornos de producción.
+
 
 ![image]()
 
