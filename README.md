@@ -1146,7 +1146,6 @@ Código:
 
         SELECT * FROM @{item().schema}.@{item().table} WHERE @{item().cdc_col} > '@{if(empty(item().from_date),activity('last_cdc').output.value[0].cdc,item().from_date)}'
 
-![image](https://github.com/user-attachments/assets/b75743a1-64ad-47af-8205-57b60f62b0d9)
 
 
 
