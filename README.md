@@ -381,13 +381,20 @@ Ahora, nos vamos a df-SpotifyProyecto y entramos a Azure Data Factory.
 
 ![image](https://github.com/user-attachments/assets/8a3d07a1-737d-4182-b4aa-e99e4cf15d20)
 
-![image]()
+![image](https://github.com/user-attachments/assets/9fe57c81-4a87-4a5c-955a-97bc056d49f4)
 
-![image]()
+Luego, vamos a nuestro github y creamos un nuevo repositorio (Spotify_Project)
 
-![image]()
 
-![image]()
+![image](https://github.com/user-attachments/assets/d94b3fe2-b179-481e-99be-5708c181f40e)
+
+
+![image](https://github.com/user-attachments/assets/4e6794d8-5875-446b-a27f-b464137787b2)
+
+
+![image](https://github.com/user-attachments/assets/1dbf3b89-a752-4bcc-96f6-a6f1b210b748)
+
+Ahora, volvemos a Azure Data Factory y lo vinculamos con el repositorio creado.
 
 ![image]()
 
@@ -709,6 +716,6 @@ VIDEO3: https://youtu.be/J0pjGjG1Zp8
 
 video4: https://youtu.be/1vTa1Bhssas
 
-video5:
+video5: https://youtu.be/SlFDUD8QTpE
 
 
