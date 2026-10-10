@@ -747,29 +747,60 @@ Luego, damos click en guardar (que esta en la esquina superior izquierda) y acep
 
 Ahora, hacemos click en la pestaña superior que dice incremental_ingestion y en actividades escribimos establecer variable y lo arrastramos al lienzo.
 
-![image]()
+![image](https://github.com/user-attachments/assets/3c09bacc-3ff5-48cd-92b6-d1335b37e213)
 
-![image]()
+![image](https://github.com/user-attachments/assets/ae18c93e-2e2b-4ca4-90a2-cb0bb9ed8a79)
 
-![image]()
+Y cambiamos el nombre a current y lo unimos a copiar datos.
 
-![image]()
+![image](https://github.com/user-attachments/assets/8f828516-b512-4104-b0fc-119151aa7825)
 
-![image]()
+Hacemos click en la parte blanca del lienzo y nos vamos a la pestaña de variables y, creamos una nueva variable con el nombre current.
 
-![image]()
+![image](https://github.com/user-attachments/assets/48c86b59-dde1-4f95-b20f-f9bcc5f3f19e)
 
-![image]()
+Regresamos a establecer variables en la pestaña de configuración, en el recuadro de nombre seleccionamos current; luego hacemos click en el cuadro de valor y luego a contenido dinámico. 
 
-![image]()
+![image](https://github.com/user-attachments/assets/f7a916ed-ae17-4f45-903f-d67a6a7e3fbc)
 
-![image]()
+![image](https://github.com/user-attachments/assets/c01156f7-1ce1-4857-a231-304733d9eef0)
 
-![image]()
+![image](https://github.com/user-attachments/assets/efcec812-35a1-447d-b83e-7b5536b0023a)
 
-![image]()
+Ahora, seleccionamos copiar datos y en Receptor (Sink) pasamos los siguientes datos:
 
-![image]()
+Container: bronze
+
+Folder: Users
+
+File:   agregaremos contenido dinámico.
+
+Primero, seleccionamos table.
+
+![image](https://github.com/user-attachments/assets/5c8edabe-73c7-49f7-8999-50e7669e0f02)
+
+Segundo, agregamos concatenar variables actuales.
+
+Código:
+
+        @concat(pipeline().parameters.table,'_',variables('current'))
+
+![image](https://github.com/user-attachments/assets/13a25fd5-ca30-4100-8585-b9b09d195cb6)
+
+Y damos click en aceptar.
+
+![image](https://github.com/user-attachments/assets/4f8ef59e-a40c-4c63-8599-09a0c00bcc57)
+
+Luego depuramos y en la ventana emergente agregamos los siguientes datos.
+
+![image](https://github.com/user-attachments/assets/79a6623b-2b96-4431-a366-74e5dd0dba48)
+
+Ahora aceptamos.
+
+![image](https://github.com/user-attachments/assets/d04f6d2a-aecc-4b7f-9cf4-bdd9f58c419c)
+
+🎥VIDEO: ![Spotify1_carga_de_datos](https://youtu.be/x01_498suPc)
+
 
 ![image]()
 
